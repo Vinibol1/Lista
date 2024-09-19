@@ -1,4 +1,6 @@
 #include "lista.h"
+#include "stdio.h"
+#include "string.h"
 
 typedef struct nodo {
 	void *elemento;
@@ -7,18 +9,25 @@ typedef struct nodo {
 
 struct lista {
 	Nodo *primer_nodo;
+	size_t tamaño;
+};
+
+struct lista_iterador {
+	Lista *lista;
+	Nodo *nodo;
 };
 
 Lista *lista_crear()
 {
 	Lista *lista = malloc(sizeof(Lista));
 	lista->primer_nodo = NULL;
+	lista->tamaño = 0;
 	return lista;
 }
 
 size_t lista_cantidad_elementos(Lista *lista)
 {
-	if (!lista->primer_nodo || !lista)
+	if (!lista || !lista->primer_nodo)
 		return 0;
 	Nodo *actual = lista->primer_nodo;
 	size_t contador = 0;
@@ -29,9 +38,174 @@ size_t lista_cantidad_elementos(Lista *lista)
 	return contador;
 }
 
+bool lista_agregar_al_final(Lista *lista, void *cosa)
+{
+	if (!lista || !cosa)
+		return false;
+	Nodo *nuevo_nodo = malloc(sizeof(struct nodo));
+	nuevo_nodo->siguiente = NULL;
+	if (!nuevo_nodo)
+		return false;
+	lista->tamaño++;
+	nuevo_nodo->elemento = cosa;
+	if (lista->primer_nodo == NULL) {
+		lista->primer_nodo = nuevo_nodo;
+		return true;
+	}
+	Nodo *actual = lista->primer_nodo;
+	while (actual->siguiente != NULL)
+		actual = actual->siguiente;
+	actual->siguiente = nuevo_nodo;
+	return true;
+}
+
+bool lista_agregar_elemento(Lista *lista, size_t posicion, void *cosa)
+{
+	if (!lista || !cosa || posicion > lista->tamaño)
+		return false;
+	int contador = 1;
+	Nodo *nuevo_nodo = NULL, *temporal = NULL, *temporal2 = NULL;
+	nuevo_nodo = malloc(sizeof(struct nodo));
+	nuevo_nodo->siguiente = NULL;
+	if (!nuevo_nodo)
+		return false;
+	lista->tamaño++;
+	nuevo_nodo->elemento = cosa;
+	temporal = lista->primer_nodo;
+	if (posicion == 1) {
+		nuevo_nodo->siguiente = temporal;
+		lista->primer_nodo = nuevo_nodo;
+	} else {
+		while ((temporal != NULL) && (contador < posicion)) {
+			contador++;
+			temporal2 = temporal;
+			temporal = temporal->siguiente;
+		}
+		temporal2->siguiente = nuevo_nodo;
+		nuevo_nodo->siguiente = temporal;
+	}
+	return true;
+}
+
+bool lista_quitar_elemento(Lista *lista, size_t posicion,
+			   void **elemento_quitado)
+{
+	if (!lista || posicion > lista->tamaño || !elemento_quitado)
+		return false;
+	int contador = 1;
+	lista->tamaño -= 1;
+	Nodo *temporal = NULL, *temporal2 = NULL;
+	temporal = lista->primer_nodo;
+	if (posicion == 1) {
+		lista->primer_nodo = lista->primer_nodo->siguiente;
+		*elemento_quitado = temporal;
+		return true;
+	} else {
+		while ((temporal != NULL) && (contador < posicion)) {
+			contador++;
+			temporal2 = temporal;
+			temporal = temporal->siguiente;
+		}
+		temporal2->siguiente = temporal->siguiente;
+		*elemento_quitado = temporal;
+	}
+	return true;
+}
+
+void *lista_buscar_elemento(Lista *lista, void *buscado,
+			    int (*comparador)(void *, void *))
+{
+	if (!lista || !buscado || !comparador)
+		return NULL;
+	Nodo *actual = lista->primer_nodo;
+	int es_igual = 1;
+	int contador = 1;
+	while (es_igual != 0 && contador < lista->tamaño) {
+		es_igual = comparador(actual->elemento, buscado);
+		if (es_igual != 0)
+			actual = actual->siguiente;
+		contador++;
+	}
+	if (es_igual != 0)
+		return NULL;
+
+	return actual->elemento;
+}
+
+bool lista_obtener_elemento(Lista *lista, size_t posicion,
+			    void **elemento_encontrado)
+{
+	if (!lista || posicion > lista_cantidad_elementos(lista) ||
+	    !elemento_encontrado)
+		return false;
+	Nodo *actual = lista->primer_nodo;
+	for (size_t i = 1; i < posicion; i++) {
+		actual = actual->siguiente;
+	}
+	if (actual->elemento)
+		*elemento_encontrado = actual->elemento;
+	return true;
+}
+
+size_t lista_iterar_elementos(Lista *lista, bool (*f)(void *, void *),
+			      void *ctx)
+{
+	if (!lista || !f)
+		return 0;
+	Nodo *actual = lista->primer_nodo;
+	size_t contador = 1;
+	while (f(actual->elemento, ctx) && actual->siguiente) {
+		actual = actual->siguiente;
+		contador++;
+	}
+	return contador;
+}
+
+Lista_iterador *lista_iterador_crear(Lista *lista)
+{
+	Lista_iterador *lista_iterador = malloc(sizeof(struct lista_iterador));
+	lista_iterador->lista = lista;
+	lista_iterador->nodo = lista->primer_nodo;
+	return lista_iterador;
+}
+
+bool lista_iterador_hay_siguiente(Lista_iterador *iterador)
+{
+	if (!iterador)
+		return false;
+	if (iterador->nodo->siguiente != NULL)
+		return true;
+	else
+		return false;
+}
+
+void lista_iterador_avanzar(Lista_iterador *iterador)
+{
+	if (!iterador)
+		return;
+	if (lista_iterador_hay_siguiente(iterador))
+		iterador->nodo = iterador->nodo->siguiente;
+}
+
+void *lista_iterador_obtener_elemento_actual(Lista_iterador *iterador)
+{
+	return iterador->nodo->elemento;
+}
+
+void lista_iterador_destruir(Lista_iterador *iterador)
+{
+	free(iterador);
+}
+
 void lista_destruir(Lista *lista)
 {
 	if (!lista)
 		return;
+	for (size_t i = 0; i < lista->tamaño; i++) {
+		Nodo *temporal = NULL;
+		temporal = lista->primer_nodo;
+		lista->primer_nodo = lista->primer_nodo->siguiente;
+		free(temporal);
+	}
 	free(lista);
 }

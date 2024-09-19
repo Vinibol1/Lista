@@ -4,9 +4,7 @@
 
 # TDA LISTA
 
-# ESTO ES UN TEMPLATE, COMPLETAR LO QUE HAGA FALTA, ELIMINAR LO QUE SOBRE (INCLUIDA ESTA LÍNEA)
-
-## Alumno: (Nombre Apellido) - (Padrón) - (Mail)
+## Alumno: Tobías Portella - 112257 - Tobias240405@gmail.com
 
 - Para compilar:
 
