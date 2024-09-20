@@ -1,5 +1,7 @@
 #include "pa2m.h"
 #include "src/lista.h"
+#include "src/pila.h"
+#include "src/cola.h"
 #include "string.h"
 
 typedef struct nodo {
@@ -8,6 +10,10 @@ typedef struct nodo {
 } Nodo;
 struct lista {
 	Nodo *primer_nodo;
+	Nodo *ultimo_nodo;
+};
+struct cola {
+	Lista *lista;
 };
 
 struct lista_iterador {
@@ -57,14 +63,11 @@ void lista_cantidad_elem_vacio()
 void lista_cantidad_elem()
 {
 	Lista *lista = lista_crear();
-	Nodo nodo;
-	Nodo nodo2;
-	Nodo nodo3;
-	nodo.siguiente = &nodo2;
-	nodo2.siguiente = &nodo3;
-	nodo3.siguiente = NULL;
-	lista->primer_nodo = &nodo;
-	pa2m_afirmar(lista_cantidad_elementos(lista) == 3, "lista con 3 nodos devuelve 3");
+	int num = 5;
+	int num3 = 4;
+	lista_agregar_al_final(lista,&num);
+	lista_agregar_al_final(lista,&num3);
+	pa2m_afirmar(lista_cantidad_elementos(lista) ==2, "lista con 2 nodos devuelve 2");
 	lista_destruir(lista);
 }
 
@@ -94,12 +97,12 @@ void lista_agregar_elem()
 
 	int num = 5;
 	int num2 = 7;
-	int num3 = 4;
 	lista_agregar_al_final(lista,&num);
-	lista_agregar_al_final(lista,&num3);
 	lista_agregar_elemento(lista,2,&num2);
 	int *tmp = lista->primer_nodo->siguiente->elemento;
+	int *tmp2 = lista->ultimo_nodo->elemento;
 	pa2m_afirmar(*tmp == 7, "lista agregar 7 en segunda posicion agrega 7");
+	pa2m_afirmar(*tmp2 == 7, "el ultimo nodo apunta correctamente");
 	lista_destruir(lista);
 }
 
@@ -115,14 +118,12 @@ void lista_quitar_elem()
 	void *elem_quitado = NULL;
 	lista_quitar_elemento(lista,2,&elem_quitado);
 	int *asd = lista->primer_nodo->siguiente->elemento;
-	Nodo *nodo_quitado = elem_quitado;
-	int *asd2 = nodo_quitado->elemento;
+	int *asd2 = elem_quitado;
 	pa2m_afirmar(*asd == 4, "El elemento se quito correctamente");
 	pa2m_afirmar(*asd2 == 7, "El elemento_quitado se guardo correctamente");
 	pa2m_afirmar(lista_quitar_elemento(NULL,3,&elem_quitado) == false, "si paso lista NULL devuelve false");
 	pa2m_afirmar(lista_quitar_elemento(lista,7,&elem_quitado) == false, "si paso posicion mas alta devuelve false");
 	pa2m_afirmar(lista_quitar_elemento(lista,3,NULL) == false, "si paso void** NULL devuelve false");
-	free(elem_quitado);
 	lista_destruir(lista);
 }
 
@@ -234,23 +235,124 @@ void lista_iterador_hay_siguiente_prueba()
 	lista_iterador_destruir(lista_iterador);
 }
 
+void pila_Crear_prueba(){
+	Pila *pila = pila_crear();
+	pa2m_afirmar(pila != NULL, "pila se creo correctamente");
+	pila_destruir(pila);
+}
+void pila_apilar_prueba(){
+	Pila *pila = pila_crear();
+	int num = 5;
+	pa2m_afirmar(pila_apilar(pila,&num) == true, "pila apilo correctamente y devuelve true");
+	int *num2 = pila_tope(pila);
+	pa2m_afirmar(*num2 == num, "pila apilo correctamente el elemento num");
+	pila_destruir(pila);
+}
+
+void pila_desapilar_prueba(){
+	Pila *pila = pila_crear();
+	int num = 5;
+	int num2 = 7;
+	pila_apilar(pila,&num);
+	pila_apilar(pila,&num2);
+	int *desapilado = pila_desapilar(pila);
+	int *num3 = pila_tope(pila);
+	pa2m_afirmar(*num3 = num, "pila desapilo correctamente el elemento num2");
+	pa2m_afirmar(*desapilado = num2, "el elemento desapilado es el pedido");
+	pila_destruir(pila);
+}
+
+void pila_vacia_prueba(){
+	Pila *pila = pila_crear();
+	int num = 3;
+	pa2m_afirmar(pila_esta_vacía(pila) == true, "pila vacia devuelve true");
+	pila_apilar(pila,&num);
+	pa2m_afirmar(pila_esta_vacía(pila) == false, "pila no vacia devuelve false");
+	pila_destruir(pila);
+
+}
+
+void cola_crear_prueba(){
+	Cola *cola = cola_crear();
+	pa2m_afirmar(cola != NULL, "Cola se creo correctamente");
+	cola_destruir(cola);
+
+}
+
+void cola_encolar_prueba(){
+	Cola *cola = cola_crear();
+	int num = 5;
+	pa2m_afirmar(cola_encolar(cola, &num) == true, "Cola se enolo correctamente");
+	int *num2 = cola_frente(cola);
+	pa2m_afirmar(*num2 = 5, "Cola se posiciono elemento correctamente");
+	cola_destruir(cola);
+}
+void cola_desencolar_prueba(){
+	Cola *cola = cola_crear();
+	int num = 5;
+	cola_encolar(cola, &num);
+	int *num2 = cola_desencolar(cola);
+	pa2m_afirmar(cola_cantidad(cola) == 0, "Cola desencolo correctamente");
+	pa2m_afirmar(*num2 = 5, "Cola guardo elemento desencolado correctamente");
+	cola_destruir(cola);
+}
+
+void cola_frente_prueba(){
+	Cola *cola = cola_crear();
+	int num = 5;
+	int num2 = 7;
+	int num3 = 10;
+	cola_encolar(cola, &num);
+	cola_encolar(cola, &num2);
+	cola_encolar(cola, &num3);
+	int *num4 = cola_frente(cola);
+	pa2m_afirmar(*num4 = 5, "Cola frente devuelve 5");
+
+	cola_destruir(cola);
+}
+
+void cola_vacia_prueba(){
+	Cola *cola = cola_crear();
+	pa2m_afirmar(cola_esta_vacía(cola) == true, "Cola vacia devuelve true");
+	cola_destruir(cola);
+}
+
+
 
 int main()
 {
-	pa2m_nuevo_grupo("Lista");
+	pa2m_nuevo_grupo("Lista crear");
 	lista_crear_prueba();
+	pa2m_nuevo_grupo("Lista cantidad");
 	lista_cantidad_elem_vacio();
 	lista_cantidad_elem();
 	lista_cantidad_NULL();
+	pa2m_nuevo_grupo("Lista agregar");
 	lista_agregar_elem_final();
 	lista_agregar_elem();
+	pa2m_nuevo_grupo("Lista quitar");
 	lista_quitar_elem();
+	pa2m_nuevo_grupo("Lista buscar");
 	lista_buscar_elem();
+	pa2m_nuevo_grupo("Lista obtener");
 	lista_obtener_elem();
+	pa2m_nuevo_grupo("Lista iterar inter");
 	lista_iterar_elem();
+	pa2m_nuevo_grupo("Lista iterar externo");
 	lista_iterador_crear_prueba();
 	lista_iterador_avanzar_prueba();
 	lista_iterador_hay_siguiente_prueba();
+	pa2m_nuevo_grupo("Pila");
+	pila_Crear_prueba();
+	pila_apilar_prueba();
+	pila_desapilar_prueba();
+	pila_vacia_prueba();
+	pa2m_nuevo_grupo("Cola");
+	cola_crear_prueba();
+	cola_encolar_prueba();
+	cola_desencolar_prueba();
+	cola_vacia_prueba();
+	cola_frente_prueba();
 
 	return pa2m_mostrar_reporte();
 }
