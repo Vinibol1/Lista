@@ -144,12 +144,16 @@ void lista_buscar_elem()
 	lista_agregar_al_final(lista, &num);
 	lista_agregar_al_final(lista, &num2);
 	lista_agregar_al_final(lista, &num3);
-	char *busc = "asd";
+	char *busc = "dsa";
 	char *busc2 = "ads";
+	char *busc3 = "asd";
 
 	char *encontro = lista_buscar_elemento(lista, busc, comparador);
+	char *encontro1 = lista_buscar_elemento(lista, busc3, comparador);
 	pa2m_afirmar(strcmp(encontro, busc) == 0,
-		     "El elemento se encontro correctamente");
+		     "El ultimo elemento se encontro correctamente");
+	pa2m_afirmar(strcmp(encontro1, busc3) == 0,
+		     "El primer elemento se encontro correctamente");
 	pa2m_afirmar(lista_buscar_elemento(lista, busc2, comparador) == NULL,
 		     "si elemento no existe devuelve NULL");
 	pa2m_afirmar(lista_buscar_elemento(lista, busc, NULL) == NULL,

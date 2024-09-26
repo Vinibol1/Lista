@@ -7,12 +7,14 @@ struct pila {
 Pila *pila_crear()
 {
 	Pila *pila = malloc(sizeof(pila));
-	if (!pila) {
+	if (!pila)
+		return NULL;
+	pila->lista = lista_crear();
+	if (!pila->lista) {
 		free(pila);
 		return NULL;
 	}
 
-	pila->lista = lista_crear();
 	return pila;
 }
 

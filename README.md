@@ -24,28 +24,26 @@ valgrind --leak-check=full --track-origins=yes --show-reachable=yes --error-exit
 ---
 
 ##  Funcionamiento
-El programa se encarga de recibir un archivo de pokemones con sus atributos y luego almacenarlos en una lista, luego el programa pedira que elijas una de dos opciones las cuales una va a ser imprimir todos los pokemones y sus atributos por pantalla, y la otra va a ser buscar un pokemon escribiendo su nombre por entrada estandar.  
+---El programa se encarga de recibir un archivo de pokemones con sus atributos y luego almacenarlos en una lista, luego el programa pedira que elijas una de dos opciones las cuales una va a ser imprimir todos los pokemones y sus atributos por pantalla, y la otra va a ser buscar un pokemon escribiendo su nombre por entrada estandar.  
 
-el programa va a abrir un archivo csv el cual va a contener los atributos de unos pokemones y lo va leer linea por linea usando la funcion leer_linea_csv, a esta función se le va a pasar el archivo, la cantidad de columnas que se desean leer, una función que recibe el string leído y un puntero al contexto, y por ultimo recibe también un puntero a un contexto.
-
-se va a ejecutar hasta que el archivo se quede sin lineas para leer y se va a crear un puntero auxiliar donde se van a guardar todos los nombres de los pokemones en memoria así no se pierde su dirección, también se va a ejecutar la función lista_agregar_al_final la cual va a agregar a los pokemones en el orden pasado por el archivo.
+---el programa va a abrir un archivo CSV el cual va a contener los atributos de unos pokemones y lo va leer linea por linea usando la función leer_linea_csv, a esta función se le va a pasar el archivo, la cantidad de columnas que se desean leer, una función que recibe el string leído y un puntero al contexto, y por ultimo recibe también un puntero a un contexto. La función se va a ejecutar hasta que el archivo se quede sin lineas para leer, también se va a ejecutar la función lista_agregar_al_final la cual va a agregar a los pokemones en el orden pasado por el archivo.
 
 
 <div align="center">
 <img width="70%" src="img/lista_agregar_final.png">
 </div>
 
-luego va a haber un while que va a iterar hasta que se elija una opción por entrada estandar correctamente, las opciones van a ser ingresar el nombre de un pokemon por entrada estandar y buscarlo o mostrar todos los pokemon leidos del archivo por pantalla.
+---luego va a haber un while que va a iterar hasta que se elija una opción por entrada estandar correctamente, las opciones van a ser ingresar el nombre de un pokemon por entrada estandar y buscarlo o mostrar todos los pokemon leidos del archivo por pantalla.
 
-se utilizan la función imprimir_pokemones_por_pantalla() la cual le pasamos la lista por parametro y lo que hace es usar un iterador externo para recorrer toda la lista con un bucle for y ir obteniendo sus elementos y despues imprimiendolos..
+---se utilizan la función imprimir_pokemones_por_pantalla() la cual le pasamos la lista por parametro y lo que hace es usar un iterador externo para recorrer toda la lista con un bucle for y ir obteniendo sus elementos y despues imprimiendolos.
 
-la otra función es comparar_pokemones_lista() la cual hace lo mismo con el iterador externo y se pasa los pokemones obtenidos por el iterador a otra función que compara el nombre de dos pokemones pasados si el nombre coincide la función devuelve el pokemon buscado y luego este se imprime por pantalla
+---la otra función es comparar_pokemones_lista() la cual hace lo mismo con el iterador externo y se pasa los pokemones obtenidos por el iterador a otra función que compara el nombre de dos pokemones pasados, si el nombre coincide, la función devuelve el pokemon buscado, y luego este se imprime por pantalla.
 
 <div align="center">
 <img width="70%" src="img/lista_iterador_avanzar.png">
 </div>
 
-luego al finalizar el programa se libera toda la memoria del programa usando sus respectivas funciónes de liberación
+---luego al finalizar el programa se libera toda la memoria del programa usando sus respectivas funciónes de liberación.
 
 ### Respuestas a las preguntas teóricas
 
@@ -53,7 +51,7 @@ luego al finalizar el programa se libera toda la memoria del programa usando sus
 
 las listas/pilas/colas son estructuras de datos que se usan para el almacenamiento y la manipulación de datos,estas estructuras son tipos de datos abstractos, ya que cada una de estas estructuras tienen su propía forma para acceder y modificar a estos datos, y también sus propias reglas. 
 
-Lista enlazada: las listas enlazadas son un tipo de dato abstracto que se caracteriza por tener nodos enlazados por punteros los cuales almacenan los datos de la lista, hay diferentes tipos como la lista doblemente enlazada o lista circular enlazada
+Lista enlazada: las listas enlazadas son un tipo de dato abstracto que se caracteriza por tener nodos enlazados por punteros los cuales almacenan los datos de la lista, hay diferentes tipos como la lista doblemente enlazada o lista circular enlazada.
 
 <div align="center">
 <img width="70%" src="img/lista_enlazada.png">

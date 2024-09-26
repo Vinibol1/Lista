@@ -20,10 +20,9 @@ struct lista_iterador {
 Lista *lista_crear()
 {
 	Lista *lista = malloc(sizeof(Lista));
-	if (!lista) {
-		free(lista);
+	if (!lista)
 		return NULL;
-	}
+
 	lista->primer_nodo = NULL;
 	lista->ultimo_nodo = NULL;
 	lista->tamaño = 0;
@@ -41,15 +40,15 @@ bool lista_agregar_al_final(Lista *lista, void *cosa)
 {
 	if (!lista || !cosa)
 		return false;
-	Nodo *nuevo_nodo = NULL;
-	nuevo_nodo = malloc(sizeof(struct nodo));
+	Nodo *nuevo_nodo = malloc(sizeof(struct nodo));
 	if (!nuevo_nodo) {
 		return false;
 	}
 
 	nuevo_nodo->siguiente = NULL;
-	lista->tamaño++;
 	nuevo_nodo->elemento = cosa;
+	lista->tamaño++;
+
 	if (lista->primer_nodo == NULL) {
 		lista->primer_nodo = nuevo_nodo;
 		lista->ultimo_nodo = nuevo_nodo;
@@ -63,16 +62,18 @@ bool lista_agregar_al_final(Lista *lista, void *cosa)
 
 bool lista_agregar_elemento(Lista *lista, size_t posicion, void *cosa)
 {
-	lista->tamaño++;
-	if (!lista || !cosa || posicion > lista->tamaño)
+	if (!lista || !cosa)
 		return false;
+
+	lista->tamaño++;
+	if (posicion > lista->tamaño)
+		return false;
+
 	int contador = 1;
 	Nodo *nuevo_nodo = NULL, *temporal = NULL, *temporal2 = NULL;
 	nuevo_nodo = malloc(sizeof(struct nodo));
-	if (!nuevo_nodo) {
-		free(nuevo_nodo);
+	if (!nuevo_nodo)
 		return false;
-	}
 
 	nuevo_nodo->siguiente = NULL;
 	nuevo_nodo->elemento = cosa;
@@ -128,7 +129,7 @@ void *lista_buscar_elemento(Lista *lista, void *buscado,
 		return NULL;
 	Nodo *actual = lista->primer_nodo;
 	int es_igual = 1;
-	int contador = 1;
+	int contador = 0;
 	while (es_igual != 0 && contador < lista->tamaño) {
 		es_igual = comparador(actual->elemento, buscado);
 		if (es_igual != 0)
@@ -161,6 +162,8 @@ bool lista_obtener_elemento(Lista *lista, size_t posicion,
 	}
 	if (actual->elemento)
 		*elemento_encontrado = actual->elemento;
+	else
+		return false;
 	return true;
 }
 
@@ -183,10 +186,8 @@ Lista_iterador *lista_iterador_crear(Lista *lista)
 	if (!lista)
 		return NULL;
 	Lista_iterador *lista_iterador = malloc(sizeof(struct lista_iterador));
-	if (!lista_iterador) {
-		free(lista_iterador);
+	if (!lista_iterador)
 		return NULL;
-	}
 
 	lista_iterador->nodo = lista->primer_nodo;
 	return lista_iterador;
@@ -196,7 +197,7 @@ bool lista_iterador_hay_siguiente(Lista_iterador *iterador)
 {
 	if (!iterador)
 		return false;
-	if (iterador->nodo->siguiente != NULL)
+	if (iterador->nodo->siguiente)
 		return true;
 	return false;
 }

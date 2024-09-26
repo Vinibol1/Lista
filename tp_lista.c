@@ -78,7 +78,9 @@ void imprimir_pokemones_por_pantalla(Lista *pokedex)
 
 void destruir_pokemon(void *pokemon)
 {
-	free(pokemon);
+	struct pokemon *pokemon_actual = pokemon;
+	free(pokemon_actual->nombre);
+	free(pokemon_actual);
 }
 
 bool leer_int(const char *str, void *ctx)
@@ -127,21 +129,12 @@ int main(int argc, char *argv[])
 	int resistencia;
 	void *punteros[COLUMNAS] = { &nombre, &tipo, &fuerza, &destreza,
 				     &resistencia };
-	int contador = 0;
-	char **nombres_pokemones = malloc(sizeof(char *));
-	if (!nombres_pokemones) {
-		lista_destruir(pokedex);
-		cerrar_archivo_csv(archivo);
-		return ERROR;
-	}
-
 	while (leer_linea_csv(archivo, COLUMNAS, funciones, punteros) ==
 	       COLUMNAS) {
 		pokemon = malloc(sizeof(struct pokemon));
 		if (!pokemon) {
 			lista_destruir(pokedex);
 			cerrar_archivo_csv(archivo);
-			free(nombres_pokemones);
 			return ERROR;
 		}
 		pokemon->nombre = nombre;
@@ -154,23 +147,18 @@ int main(int argc, char *argv[])
 			cerrar_archivo_csv(archivo);
 			return ERROR;
 		}
-		nombres_pokemones =
-			realloc(nombres_pokemones,
-				sizeof(char *) * (size_t)(contador + 1));
-		if (!nombres_pokemones) {
-			free(nombres_pokemones);
-			return ERROR;
-		}
-		nombres_pokemones[contador] = nombre;
-		contador++;
 	}
 
-	int opcion;
 	bool es_correcto = false;
 	while (!es_correcto) {
+		int opcion;
 		printf("Escribe el numero de la opción que quieras\n1. Ingrear por teclado un nombre y el programa busca el pokemon en la lista \n2. Listar todos los pokemones de la pokedex\n");
-		if (scanf("%i", &opcion) == EOF)
+		if (!scanf("%i", &opcion)) {
+			printf("No se pudo leer el numero correctamente");
+			cerrar_archivo_csv(archivo);
+			lista_destruir_todo(pokedex, destruir_pokemon);
 			return ERROR;
+		}
 		struct pokemon *pokemon_encontrado;
 		switch (opcion) {
 		case 1:
@@ -188,20 +176,18 @@ int main(int argc, char *argv[])
 			       pokemon_encontrado->fuerza,
 			       pokemon_encontrado->destreza,
 			       pokemon_encontrado->resistencia);
+			es_correcto = true;
 			break;
 		case 2:
 			imprimir_pokemones_por_pantalla(pokedex);
+			es_correcto = true;
 			break;
 
 		default:
 			printf("Numero no valido ingresado, por favor ingrese 1 o 2\n");
 			break;
 		}
-		es_correcto = true;
 	}
 	cerrar_archivo_csv(archivo);
 	lista_destruir_todo(pokedex, destruir_pokemon);
-	for (size_t i = 0; i < contador; i++)
-		free(nombres_pokemones[i]);
-	free(nombres_pokemones);
 }

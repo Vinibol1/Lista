@@ -8,12 +8,14 @@ struct cola {
 Cola *cola_crear()
 {
 	Cola *cola = malloc(sizeof(struct cola));
-	if (!cola) {
+	if (!cola)
+		return NULL;
+	cola->lista = lista_crear();
+	if (!cola->lista) {
 		free(cola);
 		return NULL;
 	}
 
-	cola->lista = lista_crear();
 	return cola;
 }
 
