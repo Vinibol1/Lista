@@ -5,6 +5,8 @@
 #include <stdio.h>
 
 #define ERROR -1
+#define VALOR_MAXIMO 300
+#define COLUMNAS 5
 
 struct pokemon {
 	char *nombre;
@@ -14,17 +16,69 @@ struct pokemon {
 	int resistencia;
 };
 
-
-
 int comparar_nombre_pokemon(void *_p1, void *_p2)
 {
 	struct pokemon *p1 = _p1;
 	struct pokemon *p2 = _p2;
-	if (!p1->nombre || !p2->nombre) {
-		printf("error");
-	}
-
 	return strcmp(p1->nombre, p2->nombre);
+}
+
+struct pokemon *comparar_pokemones_en_lista(Lista *pokedex)
+{
+	Lista_iterador *iterador;
+	char pokemon_buscado[VALOR_MAXIMO];
+	printf("escribí el nombre del pokemon que vas a buscar: ");
+	if (scanf("%s", pokemon_buscado) == EOF)
+		return NULL;
+	struct pokemon pokemon2;
+	pokemon2.nombre = pokemon_buscado;
+	struct pokemon *pokemon_actual;
+	for (iterador = lista_iterador_crear(pokedex);
+	     lista_iterador_hay_siguiente(iterador);
+	     lista_iterador_avanzar(iterador)) {
+		pokemon_actual =
+			lista_iterador_obtener_elemento_actual(iterador);
+
+		if (comparar_nombre_pokemon(pokemon_actual, &pokemon2) == 0) {
+			lista_iterador_destruir(iterador);
+			return pokemon_actual;
+		}
+	}
+	pokemon_actual = lista_iterador_obtener_elemento_actual(iterador);
+	lista_iterador_destruir(iterador);
+	if (comparar_nombre_pokemon(pokemon_actual, &pokemon2) == 0)
+		return pokemon_actual;
+	return NULL;
+}
+
+void imprimir_pokemones_por_pantalla(Lista *pokedex)
+{
+	if (!pokedex)
+		return;
+	Lista_iterador *iterador;
+	struct pokemon *pokemon_actual;
+	for (iterador = lista_iterador_crear(pokedex);
+	     lista_iterador_hay_siguiente(iterador);
+	     lista_iterador_avanzar(iterador)) {
+		pokemon_actual =
+			lista_iterador_obtener_elemento_actual(iterador);
+
+		printf("Nombre:%s, Tipo:%c, Fuerza:%i, Destreza:%i, Resistencia:%i\n",
+		       pokemon_actual->nombre, pokemon_actual->tipo,
+		       pokemon_actual->fuerza, pokemon_actual->destreza,
+		       pokemon_actual->resistencia);
+	}
+	pokemon_actual = lista_iterador_obtener_elemento_actual(iterador);
+	printf("Nombre:%s, Tipo:%c, Fuerza:%i, Destreza:%i, Resistencia:%i\n",
+	       pokemon_actual->nombre, pokemon_actual->tipo,
+	       pokemon_actual->fuerza, pokemon_actual->destreza,
+	       pokemon_actual->resistencia);
+	lista_iterador_destruir(iterador);
+}
+
+void destruir_pokemon(void *pokemon)
+{
+	free(pokemon);
 }
 
 bool leer_int(const char *str, void *ctx)
@@ -50,150 +104,104 @@ bool leer_caracter(const char *str, void *ctx)
 
 int main(int argc, char *argv[])
 {
-	struct archivo_csv *archivo = abrir_archivo_csv("pokedex.csv", ';');
+	struct archivo_csv *archivo = abrir_archivo_csv(argv[1], ';');
+	if (!archivo) {
+		cerrar_archivo_csv(archivo);
+		return ERROR;
+	}
+
 	struct pokemon *pokemon;
 
 	Lista *pokedex = lista_crear();
-	if (!archivo)
+	if (!pokedex) {
+		cerrar_archivo_csv(archivo);
 		return ERROR;
-
-	bool (*funciones[5])(const char *, void *) = { crear_string_nuevo,
-						       leer_caracter, leer_int,
-						       leer_int, leer_int };
+	}
+	bool (*funciones[COLUMNAS])(const char *, void *) = {
+		crear_string_nuevo, leer_caracter, leer_int, leer_int, leer_int
+	};
 	char *nombre = NULL;
 	char tipo;
 	int fuerza;
 	int destreza;
 	int resistencia;
-	void *punteros[5] = { &nombre, &tipo, &fuerza, &destreza,
-			      &resistencia };
+	void *punteros[COLUMNAS] = { &nombre, &tipo, &fuerza, &destreza,
+				     &resistencia };
 	int contador = 0;
-	while (leer_linea_csv(archivo, 5, funciones, punteros) == 5) {
+	char **nombres_pokemones = malloc(sizeof(char *));
+	if (!nombres_pokemones) {
+		lista_destruir(pokedex);
+		cerrar_archivo_csv(archivo);
+		return ERROR;
+	}
+
+	while (leer_linea_csv(archivo, COLUMNAS, funciones, punteros) ==
+	       COLUMNAS) {
 		pokemon = malloc(sizeof(struct pokemon));
+		if (!pokemon) {
+			lista_destruir(pokedex);
+			cerrar_archivo_csv(archivo);
+			free(nombres_pokemones);
+			return ERROR;
+		}
 		pokemon->nombre = nombre;
 		pokemon->tipo = tipo;
 		pokemon->fuerza = fuerza;
 		pokemon->destreza = destreza;
 		pokemon->resistencia = resistencia;
-		lista_agregar_al_final(pokedex, pokemon);
+		if (!lista_agregar_al_final(pokedex, pokemon)) {
+			lista_destruir(pokedex);
+			cerrar_archivo_csv(archivo);
+			return ERROR;
+		}
+		nombres_pokemones =
+			realloc(nombres_pokemones,
+				sizeof(char *) * (size_t)(contador + 1));
+		if (!nombres_pokemones) {
+			free(nombres_pokemones);
+			return ERROR;
+		}
+		nombres_pokemones[contador] = nombre;
 		contador++;
 	}
 
 	int opcion;
 	bool es_correcto = false;
 	while (!es_correcto) {
-		printf("Elegir una opcion\n. Ingrear por teclado un nombre y el programa busca el pokemon en la lista \n2. Listar todos los pokemones de la pokedex\n");
-		scanf("%i", &opcion);
-		Lista_iterador *iterador;
+		printf("Escribe el numero de la opción que quieras\n1. Ingrear por teclado un nombre y el programa busca el pokemon en la lista \n2. Listar todos los pokemones de la pokedex\n");
+		if (scanf("%i", &opcion) == EOF)
+			return ERROR;
+		struct pokemon *pokemon_encontrado;
 		switch (opcion) {
 		case 1:
-			char pokemon_buscado;
-			printf("escribí el nombre del pokemon que vas a buscar: ");
-			scanf("%s", &pokemon_buscado);
-			struct pokemon pokemon2;
-			pokemon2.nombre = &pokemon_buscado;
-
-			for (iterador = lista_iterador_crear(pokedex);
-			     lista_iterador_hay_siguiente(iterador);
-			     lista_iterador_avanzar(iterador)) {
-				struct pokemon *pokemon_actual =
-					lista_iterador_obtener_elemento_actual(
-						iterador);
-
-				if (comparar_nombre_pokemon(pokemon_actual,
-							    &pokemon2) == 0)
-					printf("Nombre:%s, Tipo:%c, Fuerza:%i, Destreza:%i, Resistencia:%i\n",
-					       pokemon_actual->nombre,
-					       pokemon_actual->tipo,
-					       pokemon_actual->fuerza,
-					       pokemon_actual->destreza,
-					       pokemon_actual->resistencia);
+			pokemon_encontrado =
+				comparar_pokemones_en_lista(pokedex);
+			if (pokemon_encontrado == NULL) {
+				printf("No se encontro el pokemon buscado");
+				cerrar_archivo_csv(archivo);
+				lista_destruir_todo(pokedex, destruir_pokemon);
+				return ERROR;
 			}
-			es_correcto = true;
+			printf("Nombre:%s, Tipo:%c, Fuerza:%i, Destreza:%i, Resistencia:%i\n",
+			       pokemon_encontrado->nombre,
+			       pokemon_encontrado->tipo,
+			       pokemon_encontrado->fuerza,
+			       pokemon_encontrado->destreza,
+			       pokemon_encontrado->resistencia);
 			break;
 		case 2:
-			for (iterador = lista_iterador_crear(pokedex);
-			     lista_iterador_hay_siguiente(iterador);
-			     lista_iterador_avanzar(iterador)) {
-				struct pokemon *pokemon_actual;
-				pokemon_actual =
-					lista_iterador_obtener_elemento_actual(
-						iterador);
-				printf("%s\n", pokemon_actual->nombre);
-			}
-			es_correcto = true;
+			imprimir_pokemones_por_pantalla(pokedex);
 			break;
 
 		default:
 			printf("Numero no valido ingresado, por favor ingrese 1 o 2\n");
 			break;
 		}
+		es_correcto = true;
 	}
+	cerrar_archivo_csv(archivo);
+	lista_destruir_todo(pokedex, destruir_pokemon);
+	for (size_t i = 0; i < contador; i++)
+		free(nombres_pokemones[i]);
+	free(nombres_pokemones);
 }
-// 	scanf("%i")
-// 		//recibir un archivo por linea de comandos
-// 		//abrir el archivo csv y parsear pokemones
-// 		//agregar los pokemones a una lista
-// 		//
-// 		//El usuario puede elegir una de dos opciones
-// 		//
-// 		//1. Ingrear por teclado un nombre y el programa busca el pokemon en la lista
-// 		//2. Listar todos los pokemones de la pokedex
-// 		//
-// 		//
-// 		struct pokemon p1;
-// 	struct pokemon p2;
-// 	//obvio que los inicializo
-
-// 	Lista *pokedex = lista_crear();
-
-// 	//agregar_pokemon_desde_archivo(pokedex, "poke.csv");
-
-// 	lista_agregar_al_final(pokedex, &p1);
-// 	lista_agregar_al_final(pokedex, &p2);
-
-// 	struct pokemon buscado = { .nombre = "Pikachu" };
-// 	struct pokemon *encontrado = lista_buscar_elemento(
-// 		pokedex, &buscado, comparar_nombre_pokemon);
-
-// 	//struct pokemon *quitado;
-// 	//lista_quitar_elemento(pokedex, 1 , (void**)&quitado);
-
-// 	struct pokemon *en_posicion;
-// 	lista_obtener_elemento(pokedex, 1, (void **)&en_posicion);
-
-// 	//Recorrer lista
-// 	//Posibilidad 1
-// 	//1+2+3+4+5+6.....+n-1+n
-// 	//puede ser O(n), O(n²) para enlazada
-// 	for (size_t i = 0; //O(1)
-// 	     i < lista_cantidad_elementos(pokedex); //O(1)
-// 	     i++) { //O(1)
-// 		struct pokemon *p;
-// 		lista_obtener_elemento(pokedex, i, (void **)&p); //O(n)
-// 		///hacer algo
-// 	}
-
-// 	//Recorrer lista
-// 	//Posibilidad 2
-// 	void *ctx = NULL;
-// 	//O(n)
-// 	lista_iterar_elementos(pokedex, hacer_algo, ctx);
-
-// 	//Recorrer lista
-// 	//Posibilidad 3
-// 	//TDA iterador externo
-// 	Lista_iterador *i;
-// 	for (i = lista_iterador_crear(pokedex); //O(1)
-// 	     lista_iterador_hay_siguiente(i); //O(1)
-// 	     lista_iterador_avanzar(i)) { //O(1)
-// 		struct pokemon *p;
-// 		p = lista_iterador_obtener_elemento_actual(i); //O(1)
-// 		///hacer algo
-// 	}
-
-// 	//lista_iterar_elementos(pokedex, liberar_pokemon, NULL);
-// 	//lista_destruir(pokedex);
-// 	lista_destruir_todo(pokedex, liberar_pokemon);
-// 	return 0;
-// }

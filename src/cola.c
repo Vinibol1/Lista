@@ -8,6 +8,11 @@ struct cola {
 Cola *cola_crear()
 {
 	Cola *cola = malloc(sizeof(struct cola));
+	if (!cola) {
+		free(cola);
+		return NULL;
+	}
+
 	cola->lista = lista_crear();
 	return cola;
 }
@@ -23,9 +28,9 @@ void *cola_frente(Cola *cola)
 {
 	if (!cola)
 		return NULL;
-	void *elemento_tope = NULL;
-	if (lista_obtener_elemento(cola->lista, 1, &elemento_tope))
-		return elemento_tope;
+	void *elemento_frente = NULL;
+	if (lista_obtener_elemento(cola->lista, 1, &elemento_frente))
+		return elemento_frente;
 	else
 		return NULL;
 }
@@ -44,9 +49,9 @@ void *cola_desencolar(Cola *cola)
 {
 	if (!cola)
 		return NULL;
-	void *elemento_desapilado = NULL;
-	if (lista_quitar_elemento(cola->lista, 1, &elemento_desapilado))
-		return elemento_desapilado;
+	void *elemento_desencolado = NULL;
+	if (lista_quitar_elemento(cola->lista, 1, &elemento_desencolado))
+		return elemento_desencolado;
 	else
 		return NULL;
 }
@@ -61,13 +66,19 @@ bool cola_esta_vacía(Cola *cola)
 		return false;
 }
 
-void cola_destruir_todo(Cola *cola, void (*f)(void *)){
-	lista_destruir_todo(cola->lista,f);
+void cola_destruir_todo(Cola *cola, void (*f)(void *))
+{
+	if (!cola || !f)
+		return;
+
+	lista_destruir_todo(cola->lista, f);
 	free(cola);
 }
 
 void cola_destruir(Cola *cola)
 {
+	if (!cola)
+		return;
 	lista_destruir(cola->lista);
 	free(cola);
 }

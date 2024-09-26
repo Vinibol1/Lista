@@ -14,16 +14,16 @@ struct lista {
 };
 
 struct lista_iterador {
-	Lista *lista;
 	Nodo *nodo;
 };
 
 Lista *lista_crear()
 {
 	Lista *lista = malloc(sizeof(Lista));
-	if (!lista)
+	if (!lista) {
+		free(lista);
 		return NULL;
-	
+	}
 	lista->primer_nodo = NULL;
 	lista->ultimo_nodo = NULL;
 	lista->tamaño = 0;
@@ -43,17 +43,18 @@ bool lista_agregar_al_final(Lista *lista, void *cosa)
 		return false;
 	Nodo *nuevo_nodo = NULL;
 	nuevo_nodo = malloc(sizeof(struct nodo));
-	nuevo_nodo->siguiente = NULL;
-	if (!nuevo_nodo)
+	if (!nuevo_nodo) {
 		return false;
+	}
+
+	nuevo_nodo->siguiente = NULL;
 	lista->tamaño++;
 	nuevo_nodo->elemento = cosa;
 	if (lista->primer_nodo == NULL) {
 		lista->primer_nodo = nuevo_nodo;
 		lista->ultimo_nodo = nuevo_nodo;
 		return true;
-	}
-	else{
+	} else {
 		lista->ultimo_nodo->siguiente = nuevo_nodo;
 		lista->ultimo_nodo = nuevo_nodo;
 	}
@@ -68,9 +69,12 @@ bool lista_agregar_elemento(Lista *lista, size_t posicion, void *cosa)
 	int contador = 1;
 	Nodo *nuevo_nodo = NULL, *temporal = NULL, *temporal2 = NULL;
 	nuevo_nodo = malloc(sizeof(struct nodo));
-	nuevo_nodo->siguiente = NULL;
-	if (!nuevo_nodo)
+	if (!nuevo_nodo) {
+		free(nuevo_nodo);
 		return false;
+	}
+
+	nuevo_nodo->siguiente = NULL;
 	nuevo_nodo->elemento = cosa;
 	temporal = lista->primer_nodo;
 	if (posicion == 1) {
@@ -140,16 +144,18 @@ void *lista_buscar_elemento(Lista *lista, void *buscado,
 bool lista_obtener_elemento(Lista *lista, size_t posicion,
 			    void **elemento_encontrado)
 {
-	if (!lista || posicion > lista_cantidad_elementos(lista) ||
-	    !elemento_encontrado)
+	if (!lista || posicion > lista->tamaño || !elemento_encontrado)
 		return false;
 	Nodo *actual = lista->primer_nodo;
-	if (posicion == 1)
-	{
+	if (posicion == 1) {
 		*elemento_encontrado = actual->elemento;
 		return true;
 	}
-	
+	if (posicion == lista->tamaño) {
+		*elemento_encontrado = lista->ultimo_nodo->elemento;
+		return true;
+	}
+
 	for (size_t i = 1; i < posicion; i++) {
 		actual = actual->siguiente;
 	}
@@ -174,8 +180,14 @@ size_t lista_iterar_elementos(Lista *lista, bool (*f)(void *, void *),
 
 Lista_iterador *lista_iterador_crear(Lista *lista)
 {
+	if (!lista)
+		return NULL;
 	Lista_iterador *lista_iterador = malloc(sizeof(struct lista_iterador));
-	lista_iterador->lista = lista;
+	if (!lista_iterador) {
+		free(lista_iterador);
+		return NULL;
+	}
+
 	lista_iterador->nodo = lista->primer_nodo;
 	return lista_iterador;
 }
@@ -186,8 +198,7 @@ bool lista_iterador_hay_siguiente(Lista_iterador *iterador)
 		return false;
 	if (iterador->nodo->siguiente != NULL)
 		return true;
-	else
-		return false;
+	return false;
 }
 
 void lista_iterador_avanzar(Lista_iterador *iterador)
@@ -200,11 +211,15 @@ void lista_iterador_avanzar(Lista_iterador *iterador)
 
 void *lista_iterador_obtener_elemento_actual(Lista_iterador *iterador)
 {
+	if (!iterador)
+		return NULL;
 	return iterador->nodo->elemento;
 }
 
 void lista_iterador_destruir(Lista_iterador *iterador)
 {
+	if (!iterador)
+		return;
 	free(iterador);
 }
 
@@ -221,12 +236,15 @@ void lista_destruir(Lista *lista)
 	}
 	free(lista);
 }
-void lista_destruir_todo(Lista *lista, void (*destructor)(void *)){
+void lista_destruir_todo(Lista *lista, void (*destructor)(void *))
+{
+	if (!lista)
+		return;
 	Nodo *actual = NULL;
-	for (size_t i = 0; i < lista->tamaño; i++)
-	{
+	for (size_t i = 0; i < lista->tamaño; i++) {
 		actual = lista->primer_nodo;
-		destructor(actual->elemento);
+		if (destructor)
+			destructor(actual->elemento);
 		lista->primer_nodo = lista->primer_nodo->siguiente;
 		free(actual);
 	}
