@@ -39,7 +39,7 @@ void *pila_tope(Pila *pila)
 	if (!pila)
 		return NULL;
 	void *elemento_tope = NULL;
-	if (lista_obtener_elemento(pila->lista, 1, &elemento_tope))
+	if (lista_obtener_elemento(pila->lista, 0, &elemento_tope))
 		return elemento_tope;
 	else
 		return NULL;
@@ -49,7 +49,7 @@ bool pila_apilar(Pila *pila, void *cosa)
 {
 	if (!pila || !cosa)
 		return false;
-	return lista_agregar_elemento(pila->lista, 1, cosa);
+	return lista_agregar_elemento(pila->lista, 0, cosa);
 }
 
 void *pila_desapilar(Pila *pila)
@@ -57,7 +57,7 @@ void *pila_desapilar(Pila *pila)
 	if (!pila)
 		return NULL;
 	void *elemento_desapilado = NULL;
-	if (lista_quitar_elemento(pila->lista, 1, &elemento_desapilado))
+	if (lista_quitar_elemento(pila->lista, 0, &elemento_desapilado))
 		return elemento_desapilado;
 	else
 		return NULL;

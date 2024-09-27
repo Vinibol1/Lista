@@ -38,7 +38,7 @@ size_t lista_cantidad_elementos(Lista *lista)
 
 bool lista_agregar_al_final(Lista *lista, void *cosa)
 {
-	if (!lista || !cosa)
+	if (!lista)
 		return false;
 	Nodo *nuevo_nodo = malloc(sizeof(struct nodo));
 	if (!nuevo_nodo) {
@@ -62,14 +62,14 @@ bool lista_agregar_al_final(Lista *lista, void *cosa)
 
 bool lista_agregar_elemento(Lista *lista, size_t posicion, void *cosa)
 {
-	if (!lista || !cosa)
+	if (!lista)
 		return false;
 
 	lista->tamaño++;
 	if (posicion > lista->tamaño)
 		return false;
 
-	int contador = 1;
+	int contador = 0;
 	Nodo *nuevo_nodo = NULL, *temporal = NULL, *temporal2 = NULL;
 	nuevo_nodo = malloc(sizeof(struct nodo));
 	if (!nuevo_nodo)
@@ -78,7 +78,7 @@ bool lista_agregar_elemento(Lista *lista, size_t posicion, void *cosa)
 	nuevo_nodo->siguiente = NULL;
 	nuevo_nodo->elemento = cosa;
 	temporal = lista->primer_nodo;
-	if (posicion == 1) {
+	if (posicion == 0) {
 		nuevo_nodo->siguiente = temporal;
 		lista->primer_nodo = nuevo_nodo;
 	} else {
@@ -98,13 +98,14 @@ bool lista_agregar_elemento(Lista *lista, size_t posicion, void *cosa)
 bool lista_quitar_elemento(Lista *lista, size_t posicion,
 			   void **elemento_quitado)
 {
-	if (!lista || posicion > lista->tamaño || !elemento_quitado)
+	if (!lista || posicion > lista->tamaño || !elemento_quitado ||
+	    !lista->primer_nodo)
 		return false;
-	int contador = 1;
+	int contador = 0;
 	lista->tamaño -= 1;
 	Nodo *temporal = NULL, *temporal2 = NULL;
 	temporal = lista->primer_nodo;
-	if (posicion == 1) {
+	if (posicion == 0) {
 		lista->primer_nodo = lista->primer_nodo->siguiente;
 		*elemento_quitado = temporal->elemento;
 		free(temporal);
@@ -145,10 +146,11 @@ void *lista_buscar_elemento(Lista *lista, void *buscado,
 bool lista_obtener_elemento(Lista *lista, size_t posicion,
 			    void **elemento_encontrado)
 {
-	if (!lista || posicion > lista->tamaño || !elemento_encontrado)
+	if (!lista || posicion > lista->tamaño || !elemento_encontrado ||
+	    !lista->primer_nodo)
 		return false;
 	Nodo *actual = lista->primer_nodo;
-	if (posicion == 1) {
+	if (posicion == 0) {
 		*elemento_encontrado = actual->elemento;
 		return true;
 	}
@@ -157,7 +159,7 @@ bool lista_obtener_elemento(Lista *lista, size_t posicion,
 		return true;
 	}
 
-	for (size_t i = 1; i < posicion; i++) {
+	for (size_t i = 0; i < posicion; i++) {
 		actual = actual->siguiente;
 	}
 	if (actual->elemento)

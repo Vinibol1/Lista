@@ -11,6 +11,7 @@ typedef struct nodo {
 struct lista {
 	Nodo *primer_nodo;
 	Nodo *ultimo_nodo;
+	size_t tamaño;
 };
 struct cola {
 	Lista *lista;
@@ -91,8 +92,6 @@ void lista_agregar_elem_final()
 	pa2m_afirmar(*tmp == 7, "lista agregar 7 final agrega 7");
 	pa2m_afirmar(lista_agregar_al_final(NULL, &num2) == false,
 		     "lista NULL devuelve false");
-	pa2m_afirmar(lista_agregar_al_final(lista, NULL) == false,
-		     "cosa NULL devuelve false");
 	lista_destruir(lista);
 }
 
@@ -103,11 +102,15 @@ void lista_agregar_elem()
 	int num = 5;
 	int num2 = 7;
 	lista_agregar_al_final(lista, &num);
-	lista_agregar_elemento(lista, 2, &num2);
-	int *tmp = lista->primer_nodo->siguiente->elemento;
+	lista_agregar_elemento(lista, 0, &num2);
+
 	int *tmp2 = lista->ultimo_nodo->elemento;
-	pa2m_afirmar(*tmp == 7, "lista agregar 7 en segunda posicion agrega 7");
-	pa2m_afirmar(*tmp2 == 7, "el ultimo nodo apunta correctamente");
+	void *elem_buscado = NULL;
+	lista_obtener_elemento(lista, 0, &elem_buscado);
+	int *ints = elem_buscado;
+	pa2m_afirmar(ints == &num2,
+		     "agregar en posicion 0 se obtiene en posicion 0");
+	pa2m_afirmar(*tmp2 == 5, "el ultimo nodo apunta correctamente");
 	lista_destruir(lista);
 }
 
@@ -124,14 +127,52 @@ void lista_quitar_elem()
 	lista_quitar_elemento(lista, 2, &elem_quitado);
 	int *asd = lista->primer_nodo->siguiente->elemento;
 	int *asd2 = elem_quitado;
-	pa2m_afirmar(*asd == 4, "El elemento se quito correctamente");
-	pa2m_afirmar(*asd2 == 7, "El elemento_quitado se guardo correctamente");
+	pa2m_afirmar(*asd == 7, "El elemento se quito correctamente");
+	pa2m_afirmar(*asd2 == 4, "El elemento_quitado se guardo correctamente");
 	pa2m_afirmar(lista_quitar_elemento(NULL, 3, &elem_quitado) == false,
 		     "si paso lista NULL devuelve false");
 	pa2m_afirmar(lista_quitar_elemento(lista, 7, &elem_quitado) == false,
 		     "si paso posicion mas alta devuelve false");
 	pa2m_afirmar(lista_quitar_elemento(lista, 3, NULL) == false,
 		     "si paso void** NULL devuelve false");
+	lista_destruir(lista);
+}
+
+void lista_vaciar_final()
+{
+	Lista *lista = lista_crear();
+	int num = 5;
+	int num2 = 7;
+	int num3 = 4;
+	lista_agregar_al_final(lista, &num);
+	lista_agregar_al_final(lista, &num2);
+	lista_agregar_al_final(lista, &num3);
+	void *elem_quitado = NULL;
+	while (lista->tamaño > 0) {
+		lista_quitar_elemento(lista, lista->tamaño - 1, &elem_quitado);
+	}
+	pa2m_afirmar(lista->primer_nodo == NULL,
+		     "lista se vacio correctamente");
+
+	lista_destruir(lista);
+}
+
+void lista_vaciar_principio()
+{
+	Lista *lista = lista_crear();
+	int num = 5;
+	int num2 = 7;
+	int num3 = 4;
+	lista_agregar_al_final(lista, &num);
+	lista_agregar_al_final(lista, &num2);
+	lista_agregar_al_final(lista, &num3);
+	void *elem_quitado = NULL;
+	while (lista->tamaño > 0) {
+		lista_quitar_elemento(lista, 0, &elem_quitado);
+	}
+	pa2m_afirmar(lista->primer_nodo == NULL,
+		     "lista se vacio correctamente");
+
 	lista_destruir(lista);
 }
 
@@ -173,7 +214,7 @@ void lista_obtener_elem()
 	void *elem_buscado = NULL;
 	lista_obtener_elemento(lista, 3, &elem_buscado);
 	int *asd = elem_buscado;
-	pa2m_afirmar(*asd == 4, "El elemento se guardo correctamente");
+	pa2m_afirmar(asd == &num3, "El elemento se guardo correctamente");
 	pa2m_afirmar(lista_obtener_elemento(NULL, 3, &elem_buscado) == false,
 		     "si paso lista NULL devuelve false");
 	pa2m_afirmar(lista_obtener_elemento(lista, 7, &elem_buscado) == false,
@@ -369,6 +410,9 @@ int main()
 	lista_buscar_elem();
 	pa2m_nuevo_grupo("Lista obtener");
 	lista_obtener_elem();
+	pa2m_nuevo_grupo("Lista vaciar");
+	lista_vaciar_principio();
+	lista_vaciar_final();
 	pa2m_nuevo_grupo("Lista iterar inter");
 	lista_iterar_elem();
 	pa2m_nuevo_grupo("Lista iterar externo");

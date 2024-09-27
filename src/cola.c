@@ -31,7 +31,7 @@ void *cola_frente(Cola *cola)
 	if (!cola)
 		return NULL;
 	void *elemento_frente = NULL;
-	if (lista_obtener_elemento(cola->lista, 1, &elemento_frente))
+	if (lista_obtener_elemento(cola->lista, 0, &elemento_frente))
 		return elemento_frente;
 	else
 		return NULL;
@@ -52,7 +52,7 @@ void *cola_desencolar(Cola *cola)
 	if (!cola)
 		return NULL;
 	void *elemento_desencolado = NULL;
-	if (lista_quitar_elemento(cola->lista, 1, &elemento_desencolado))
+	if (lista_quitar_elemento(cola->lista, 0, &elemento_desencolado))
 		return elemento_desencolado;
 	else
 		return NULL;
