@@ -49,7 +49,7 @@ valgrind --leak-check=full --track-origins=yes --show-reachable=yes --error-exit
 
 ## ¿Qué es una lista/pila/cola? Explicar con diagramas.
 
-las listas/pilas/colas son estructuras de datos que se usan para el almacenamiento y la manipulación de datos,estas estructuras son tipos de datos abstractos, ya que cada una de estas estructuras tienen su propía forma para acceder y modificar a estos datos, y también sus propias reglas. 
+---las listas/pilas/colas son estructuras de datos que se usan para el almacenamiento y la manipulación de datos,estas estructuras son tipos de datos abstractos, ya que cada una de estas estructuras tienen su propía forma para acceder y modificar a estos datos, y también sus propias reglas. 
 
 Lista enlazada: las listas enlazadas son un tipo de dato abstracto que se caracteriza por tener nodos enlazados por punteros los cuales almacenan los datos de la lista, hay diferentes tipos como la lista doblemente enlazada o lista circular enlazada.
 
@@ -77,25 +77,25 @@ sus principales operaciones son encolar y desencolar.
    - Insertar/obtener/eliminar al medio
 
 # Lista simplemente enlazada:
-La implementación de insertar tiene complejidad de O(1) para insertar al principio y para el final ya que simplemente tiene que acceder a los punteros ultimo_nodo/primer_nodo, en cambio para insertar en una posición média es O(n). en el caso de no tener un puntero al ultimo_nodo seria 0(n) para insertar al final
+-La implementación de insertar tiene complejidad de O(1) para insertar al principio y para el final ya que simplemente tiene que acceder a los punteros ultimo_nodo/primer_nodo, en cambio para insertar en una posición média es O(n). en el caso de no tener un puntero al ultimo_nodo seria 0(n) para insertar al final
 
-la implementación de obtener es igual O(1) para el principio o final y O(n) para un elemento medio porque tiene que recorrer la lista yendo de puntero en puntero.
+-la implementación de obtener es igual O(1) para el principio o final y O(n) para un elemento medio porque tiene que recorrer la lista yendo de puntero en puntero.
 
-Eliminar al inicio tiene una complejidad de O(1)
+-Eliminar al inicio tiene una complejidad de O(1)
 
 # Lista doblemente enlazada:
-las listas doblemente enlazadas van a tardar un poco mas en la insersión y en eliminar ya que requieren mas operaciones con punteros, su implementación de insertar tiene complejidad de O(1) para insertar al principio y para el final ya que simplemente tiene que acceder a los punteros ultimo_nodo/primer_nodo, en cambio para insertar en una posición média es O(n), en el caso de no tener un puntero al ultimo_nodo seria 0(n) para insertar al final.
+-las listas doblemente enlazadas van a tardar un poco mas en la insersión y en eliminar ya que requieren mas operaciones con punteros, su implementación de insertar tiene complejidad de O(1) para insertar al principio y para el final ya que simplemente tiene que acceder a los punteros ultimo_nodo/primer_nodo, en cambio para insertar en una posición média es O(n), en el caso de no tener un puntero al ultimo_nodo seria 0(n) para insertar al final.
 
-la implementación de obtener es igual O(1) para el principio o final y O(n) para un elemento medio porque tiene que recorrer la lista yendo de puntero en puntero.
+-la implementación de obtener es igual O(1) para el principio o final y O(n) para un elemento medio porque tiene que recorrer la lista yendo de puntero en puntero.
 
-Eliminar al final tiene una complejidad de O(1) si tiene un puntero al utimo nodo y de 0(n) si no lo tiene
+-Eliminar al final tiene una complejidad de O(1) si tiene un puntero al utimo nodo y de 0(n) si no lo tiene
 
 # vector dinamico:
-insertar tiene una complejidad de O(n) al principio a la mitad y al final si esta lleno, si no este lleno tiene un complejidad de O(1) al final
+-insertar tiene una complejidad de O(n) al principio a la mitad y al final si esta lleno, si no este lleno tiene un complejidad de O(1) al final
 
-la implementación de obtener es O(1) ya que simplemente hay que insertar la posición buscada como indice del vector
+-la implementación de obtener es O(1) ya que simplemente hay que insertar la posición buscada como indice del vector
 
-Eliminar al medio tiene una complejidad de O(n)
+-Eliminar al medio tiene una complejidad de O(n)
 
 
 ## Explica la complejidad de las operaciones implementadas en tu trabajo para la pila y la cola.
