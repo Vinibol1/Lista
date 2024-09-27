@@ -44,10 +44,8 @@ struct pokemon *comparar_pokemones_en_lista(Lista *pokedex)
 			return pokemon_actual;
 		}
 	}
-	pokemon_actual = lista_iterador_obtener_elemento_actual(iterador);
+
 	lista_iterador_destruir(iterador);
-	if (comparar_nombre_pokemon(pokemon_actual, &pokemon2) == 0)
-		return pokemon_actual;
 	return NULL;
 }
 
@@ -68,12 +66,6 @@ void imprimir_pokemones_por_pantalla(Lista *pokedex)
 		       pokemon_actual->fuerza, pokemon_actual->destreza,
 		       pokemon_actual->resistencia);
 	}
-	pokemon_actual = lista_iterador_obtener_elemento_actual(iterador);
-	printf("Nombre:%s, Tipo:%c, Fuerza:%i, Destreza:%i, Resistencia:%i\n",
-	       pokemon_actual->nombre, pokemon_actual->tipo,
-	       pokemon_actual->fuerza, pokemon_actual->destreza,
-	       pokemon_actual->resistencia);
-	lista_iterador_destruir(iterador);
 }
 
 void destruir_pokemon(void *pokemon)

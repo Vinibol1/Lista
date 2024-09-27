@@ -65,10 +65,9 @@ bool lista_agregar_elemento(Lista *lista, size_t posicion, void *cosa)
 	if (!lista)
 		return false;
 
-	lista->tamaño++;
 	if (posicion > lista->tamaño)
 		return false;
-
+	lista->tamaño++;
 	int contador = 0;
 	Nodo *nuevo_nodo = NULL, *temporal = NULL, *temporal2 = NULL;
 	nuevo_nodo = malloc(sizeof(struct nodo));
@@ -98,8 +97,7 @@ bool lista_agregar_elemento(Lista *lista, size_t posicion, void *cosa)
 bool lista_quitar_elemento(Lista *lista, size_t posicion,
 			   void **elemento_quitado)
 {
-	if (!lista || posicion > lista->tamaño || !elemento_quitado ||
-	    !lista->primer_nodo)
+	if (!lista || posicion > lista->tamaño || !lista->primer_nodo)
 		return false;
 	int contador = 0;
 	lista->tamaño -= 1;
@@ -107,7 +105,9 @@ bool lista_quitar_elemento(Lista *lista, size_t posicion,
 	temporal = lista->primer_nodo;
 	if (posicion == 0) {
 		lista->primer_nodo = lista->primer_nodo->siguiente;
-		*elemento_quitado = temporal->elemento;
+		if (elemento_quitado)
+			*elemento_quitado = temporal->elemento;
+
 		free(temporal);
 		return true;
 	} else {
@@ -117,7 +117,8 @@ bool lista_quitar_elemento(Lista *lista, size_t posicion,
 			temporal = temporal->siguiente;
 		}
 		temporal2->siguiente = temporal->siguiente;
-		*elemento_quitado = temporal->elemento;
+		if (elemento_quitado)
+			*elemento_quitado = temporal->elemento;
 		free(temporal);
 	}
 	return true;
@@ -146,33 +147,33 @@ void *lista_buscar_elemento(Lista *lista, void *buscado,
 bool lista_obtener_elemento(Lista *lista, size_t posicion,
 			    void **elemento_encontrado)
 {
-	if (!lista || posicion > lista->tamaño || !elemento_encontrado ||
-	    !lista->primer_nodo)
+	if (!lista || posicion > lista->tamaño || !lista->primer_nodo)
 		return false;
 	Nodo *actual = lista->primer_nodo;
 	if (posicion == 0) {
-		*elemento_encontrado = actual->elemento;
+		if (elemento_encontrado)
+			*elemento_encontrado = actual->elemento;
+
 		return true;
 	}
 	if (posicion == lista->tamaño) {
-		*elemento_encontrado = lista->ultimo_nodo->elemento;
+		if (elemento_encontrado)
+			*elemento_encontrado = lista->ultimo_nodo->elemento;
 		return true;
 	}
 
 	for (size_t i = 0; i < posicion; i++) {
 		actual = actual->siguiente;
 	}
-	if (actual->elemento)
+	if (elemento_encontrado)
 		*elemento_encontrado = actual->elemento;
-	else
-		return false;
 	return true;
 }
 
 size_t lista_iterar_elementos(Lista *lista, bool (*f)(void *, void *),
 			      void *ctx)
 {
-	if (!lista || !f)
+	if (!lista || !f || !lista->primer_nodo)
 		return 0;
 	Nodo *actual = lista->primer_nodo;
 	size_t contador = 1;
@@ -199,7 +200,7 @@ bool lista_iterador_hay_siguiente(Lista_iterador *iterador)
 {
 	if (!iterador)
 		return false;
-	if (iterador->nodo->siguiente)
+	if (iterador->nodo)
 		return true;
 	return false;
 }

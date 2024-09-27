@@ -219,8 +219,8 @@ void lista_obtener_elem()
 		     "si paso lista NULL devuelve false");
 	pa2m_afirmar(lista_obtener_elemento(lista, 7, &elem_buscado) == false,
 		     "si paso posicion mas alta devuelve false");
-	pa2m_afirmar(lista_obtener_elemento(lista, 3, NULL) == false,
-		     "si paso void** NULL devuelve false");
+	pa2m_afirmar(lista_obtener_elemento(lista, 3, NULL) == true,
+		     "si paso void** NULL devuelve true");
 	lista_destruir(lista);
 }
 
@@ -293,8 +293,8 @@ void lista_iterador_hay_siguiente_prueba()
 	pa2m_afirmar(lista_iterador_hay_siguiente(lista_iterador) == true,
 		     "en posicion 2 de 3 hay siguiente y devuelve true");
 	lista_iterador_avanzar(lista_iterador);
-	pa2m_afirmar(lista_iterador_hay_siguiente(lista_iterador) == false,
-		     "en posicion 3 de 3 no hay siguiente y devuelve false");
+	pa2m_afirmar(lista_iterador_hay_siguiente(lista_iterador) == true,
+		     "en posicion 3 de 3 hay siguiente y devuelve true");
 	lista_destruir(lista);
 	lista_iterador_destruir(lista_iterador);
 }
