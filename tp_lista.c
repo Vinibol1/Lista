@@ -66,6 +66,7 @@ void imprimir_pokemones_por_pantalla(Lista *pokedex)
 		       pokemon_actual->fuerza, pokemon_actual->destreza,
 		       pokemon_actual->resistencia);
 	}
+	lista_iterador_destruir(iterador);
 }
 
 void destruir_pokemon(void *pokemon)

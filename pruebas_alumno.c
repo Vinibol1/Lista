@@ -123,6 +123,7 @@ void lista_quitar_elem()
 	lista_agregar_al_final(lista, &num);
 	lista_agregar_al_final(lista, &num2);
 	lista_agregar_al_final(lista, &num3);
+	printf("%li", lista->tamaño);
 	void *elem_quitado = NULL;
 	lista_quitar_elemento(lista, 2, &elem_quitado);
 	int *asd = lista->primer_nodo->siguiente->elemento;
@@ -133,7 +134,7 @@ void lista_quitar_elem()
 		     "si paso lista NULL devuelve false");
 	pa2m_afirmar(lista_quitar_elemento(lista, 7, &elem_quitado) == false,
 		     "si paso posicion mas alta devuelve false");
-	pa2m_afirmar(lista_quitar_elemento(lista, 3, NULL) == false,
+	pa2m_afirmar(lista_quitar_elemento(lista, 0, NULL) == true,
 		     "si paso void** NULL devuelve false");
 	lista_destruir(lista);
 }
@@ -212,14 +213,14 @@ void lista_obtener_elem()
 	lista_agregar_al_final(lista, &num2);
 	lista_agregar_al_final(lista, &num3);
 	void *elem_buscado = NULL;
-	lista_obtener_elemento(lista, 3, &elem_buscado);
+	lista_obtener_elemento(lista, 2, &elem_buscado);
 	int *asd = elem_buscado;
 	pa2m_afirmar(asd == &num3, "El elemento se guardo correctamente");
 	pa2m_afirmar(lista_obtener_elemento(NULL, 3, &elem_buscado) == false,
 		     "si paso lista NULL devuelve false");
 	pa2m_afirmar(lista_obtener_elemento(lista, 7, &elem_buscado) == false,
 		     "si paso posicion mas alta devuelve false");
-	pa2m_afirmar(lista_obtener_elemento(lista, 3, NULL) == true,
+	pa2m_afirmar(lista_obtener_elemento(lista, 2, NULL) == true,
 		     "si paso void** NULL devuelve true");
 	lista_destruir(lista);
 }
@@ -234,6 +235,40 @@ void lista_iterar_elem()
 	lista_agregar_al_final(lista, &num2);
 	lista_agregar_al_final(lista, &num3);
 
+	pa2m_afirmar(lista_iterar_elementos(lista, sumar_2, NULL) == 3,
+		     "itero 3 veces devuelve 3");
+	pa2m_afirmar(num2 == 8, "se sumo 2 correctamente a nodo medio");
+	pa2m_afirmar(num3 == 9, "se sumo 2 correctamente a nodo final");
+	pa2m_afirmar(lista_iterar_elementos(lista, sumar_2_excepto_4, NULL) ==
+			     1,
+		     "itero 1 veces devuelve 1");
+	lista_destruir(lista);
+}
+
+void agregar_quitar_iterar()
+{
+	Lista *lista = lista_crear();
+	int num = 2;
+	int num2 = 6;
+	int num3 = 7;
+	lista_agregar_al_final(lista, &num);
+	lista_agregar_al_final(lista, &num2);
+	lista_agregar_al_final(lista, &num3);
+	void *elem_quitado1 = NULL;
+	void *elem_quitado2 = NULL;
+	void *elem_quitado3 = NULL;
+	lista_quitar_elemento(lista, lista->tamaño - 1, &elem_quitado1);
+	pa2m_afirmar(elem_quitado1 == &num3,
+		     "elemento quitado es igual elemennto agregador");
+	lista_quitar_elemento(lista, lista->tamaño - 1, &elem_quitado2);
+	pa2m_afirmar(elem_quitado2 == &num2,
+		     "elemento quitado es igual elemennto agregador");
+	lista_quitar_elemento(lista, lista->tamaño - 1, &elem_quitado3);
+	pa2m_afirmar(elem_quitado3 == &num,
+		     "elemento quitado es igual elemennto agregador");
+	lista_agregar_al_final(lista, elem_quitado3);
+	lista_agregar_al_final(lista, elem_quitado2);
+	lista_agregar_al_final(lista, elem_quitado1);
 	pa2m_afirmar(lista_iterar_elementos(lista, sumar_2, NULL) == 3,
 		     "itero 3 veces devuelve 3");
 	pa2m_afirmar(num2 == 8, "se sumo 2 correctamente a nodo medio");
@@ -430,6 +465,7 @@ int main()
 	cola_desencolar_prueba();
 	cola_vacia_prueba();
 	cola_frente_prueba();
+	agregar_quitar_iterar();
 
 	return pa2m_mostrar_reporte();
 }

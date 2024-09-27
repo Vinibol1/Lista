@@ -52,7 +52,6 @@ bool lista_agregar_al_final(Lista *lista, void *cosa)
 	if (lista->primer_nodo == NULL) {
 		lista->primer_nodo = nuevo_nodo;
 		lista->ultimo_nodo = nuevo_nodo;
-		return true;
 	} else {
 		lista->ultimo_nodo->siguiente = nuevo_nodo;
 		lista->ultimo_nodo = nuevo_nodo;
@@ -97,17 +96,16 @@ bool lista_agregar_elemento(Lista *lista, size_t posicion, void *cosa)
 bool lista_quitar_elemento(Lista *lista, size_t posicion,
 			   void **elemento_quitado)
 {
-	if (!lista || posicion > lista->tamaño || !lista->primer_nodo)
+	if (!lista || !lista->primer_nodo || posicion > lista->tamaño - 1)
 		return false;
-	int contador = 0;
 	lista->tamaño -= 1;
+	int contador = 0;
 	Nodo *temporal = NULL, *temporal2 = NULL;
 	temporal = lista->primer_nodo;
 	if (posicion == 0) {
 		lista->primer_nodo = lista->primer_nodo->siguiente;
-		if (elemento_quitado)
+		if (elemento_quitado && temporal->elemento)
 			*elemento_quitado = temporal->elemento;
-
 		free(temporal);
 		return true;
 	} else {
@@ -116,8 +114,11 @@ bool lista_quitar_elemento(Lista *lista, size_t posicion,
 			temporal2 = temporal;
 			temporal = temporal->siguiente;
 		}
+		if (posicion == lista->tamaño)
+			lista->ultimo_nodo = temporal2;
+
 		temporal2->siguiente = temporal->siguiente;
-		if (elemento_quitado)
+		if (elemento_quitado && temporal->elemento)
 			*elemento_quitado = temporal->elemento;
 		free(temporal);
 	}
@@ -147,7 +148,7 @@ void *lista_buscar_elemento(Lista *lista, void *buscado,
 bool lista_obtener_elemento(Lista *lista, size_t posicion,
 			    void **elemento_encontrado)
 {
-	if (!lista || posicion > lista->tamaño || !lista->primer_nodo)
+	if (!lista || posicion >= lista->tamaño || !lista->primer_nodo)
 		return false;
 	Nodo *actual = lista->primer_nodo;
 	if (posicion == 0) {
@@ -215,7 +216,7 @@ void lista_iterador_avanzar(Lista_iterador *iterador)
 
 void *lista_iterador_obtener_elemento_actual(Lista_iterador *iterador)
 {
-	if (!iterador)
+	if (!iterador || !iterador->nodo)
 		return NULL;
 	return iterador->nodo->elemento;
 }
